@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 AI Image Caption Matcher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48cae4, #ff6b6b);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .upload-section {
+            background: linear-gradient(145deg, #f0f2f5, #ffffff);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .upload-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .results-section {
+            background: linear-gradient(145deg, #ffffff, #f0f2f5);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .results-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .upload-area {
+            border: 3px dashed #4ecdc4;
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(145deg, #f8f9fa, #ffffff);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .upload-area:hover::before {
+            left: 100%;
+        }
+
+        .upload-area:hover {
+            border-color: #ff6b6b;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #4ecdc4;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .upload-btn:hover {
+            background: linear-gradient(45deg, #44a08d, #4ecdc4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+        }
+
+        .image-preview {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .image-preview:hover {
+            transform: scale(1.05);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4ecdc4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .caption-item {
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-left: 4px solid #4ecdc4;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .caption-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(78, 205, 196, 0.05), rgba(255, 107, 107, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .caption-item:hover::before {
+            opacity: 1;
+        }
+
+        .caption-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-left-color: #ff6b6b;
+        }
+
+        .caption-rank {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            float: left;
+            margin-right: 15px;
+            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .caption-text {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            border-radius: 4px;
+            transition: width 1s ease;
+            position: relative;
+        }
+
+        .confidence-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .confidence-text {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .info-box {
+            background: linear-gradient(145deg, #e3f2fd, #ffffff);
+            border: 1px solid #bbdefb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #1565c0;
+            text-align: center;
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Image Caption Matcher</h1>
+            <p>Upload an image and discover the perfect captions using advanced AI!</p>
+        </div>
+
+        <div class="main-content">
+            <div class="upload-section">
+                <h2>📸 Upload Your Image</h2>
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📤</div>
+                    <h3>Click to Upload Image</h3>
+                    <p>Supports PNG, JPG, JPEG files</p>
+                    <button class="upload-btn">Choose File</button>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" onchange="handleImageUpload(event)">
+                <div id="imagePreview"></div>
+            </div>
+
+            <div class="results-section">
+                <h2>🏆 AI Caption Results</h2>
+                <div id="results">
+                    <div class="info-box">
+                        <h3>🚀 How it works:</h3>
+                        <p><strong>1.</strong> Upload any image (PNG, JPG, JPEG)</p>
+                        <p><strong>2.</strong> Our AI analyzes it using CLIP technology</p>
+                        <p><strong>3.</strong> Get the top 5 best matching captions!</p>
+                        <br>
+                        <p><strong>💡 Tips:</strong></p>
+                        <p>• Clear, well-lit images work best</p>
+                        <p>• First run takes 2-3 minutes (AI model loading)</p>
+                        <p>• Try different types of images for variety!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            🤖 Powered by OpenAI's CLIP Model | Built with HTML, CSS & JavaScript
+        </div>
+    </div>
+
+    <script>
+        // Candidate captions (same as your original list)
+        const CANDIDATE_CAPTIONS = [
+            "Trees, Travel and Tea!",
+            "A refreshing beverage.",
+            "A moment of indulgence.",
+            "The perfect thirst quencher.",
+            "Your daily dose of delight.",
+            "Taste the tradition.",
+            "Savor the flavor.",
+            "Refresh and rejuvenate.",
+            "Unwind and enjoy.",
+            "The taste of home.",
+            "A treat for your senses.",
+            "A taste of adventure.",
+            "A moment of bliss.",
+            "Your travel companion.",
+            "Fuel for your journey.",
+            "The essence of nature.",
+            "The warmth of comfort.",
+            "A sip of happiness.",
+            "Pure indulgence.",
+            "Quench your thirst, ignite your spirit.",
+            "Awaken your senses, embrace the moment.",
+            "The taste of faraway lands.",
+            "A taste of home, wherever you are.",
+            "Your daily dose of delight.",
+            "Your moment of serenity.",
+            "The perfect pick-me-up.",
+            "The perfect way to unwind.",
+            "Taste the difference.",
+            "Experience the difference.",
+            "A refreshing escape.",
+            "A delightful escape.",
+            "The taste of tradition, the spirit of adventure.",
+            "The warmth of home, the joy of discovery.",
+            "Your passport to flavor.",
+            "Your ticket to tranquility.",
+            "Sip, savor, and explore.",
+            "Indulge, relax, and rejuvenate.",
+            "The taste of wanderlust.",
+            "The comfort of home.",
+            "A journey for your taste buds.",
+            "A haven for your senses.",
+            "Your refreshing companion.",
+            "Your delightful escape.",
+            "Taste the world, one sip at a time.",
+            "Embrace the moment, one cup at a time.",
+            "The essence of exploration.",
+            "The comfort of connection.",
+            "Quench your thirst for adventure.",
+            "Savor the moment of peace.",
+            "The taste of discovery.",
+            "The warmth of belonging.",
+            "Your travel companion, your daily delight.",
+            "Your moment of peace, your daily indulgence.",
+            "The spirit of exploration, the comfort of home.",
+            "The joy of discovery, the warmth of connection.",
+            "Sip, savor, and set off on an adventure.",
+            "Indulge, relax, and find your peace.",
+            "A delightful beverage.",
+            "A moment of relaxation.",
+            "The perfect way to start your day.",
+            "The perfect way to end your day.",
+            "A treat for yourself.",
+            "Something to savor.",
+            "A moment of calm.",
+            "A taste of something special.",
+            "A refreshing pick-me-up.",
+            "A comforting drink.",
+            "A taste of adventure.",
+            "A moment of peace.",
+            "A small indulgence.",
+            "A daily ritual.",
+            "A way to connect with others.",
+            "A way to connect with yourself.",
+            "A taste of home.",
+            "A taste of something new.",
+            "A moment to enjoy.",
+            "A moment to remember."
+        ];
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                displayImagePreview(file);
+                showLoading();
+                analyzeImageWithAI(file);
+            }
+        }
+        
+        async function analyzeImageWithAI(file) {
+            try {
+                const formData = new FormData();
+                formData.append('image', file);
+                
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayRealResults(data.results);
+                } else {
+                    showError(data.error || 'Failed to analyze image');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Network error. Please try again.');
+            }
+        }
+
+        function displayImagePreview(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('imagePreview');
+                preview.innerHTML = `<img src="${e.target.result}" class="image-preview" alt="Uploaded image">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showLoading() {
+            const results = document.getElementById('results');
+            results.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <h3>🤖 AI is analyzing your image...</h3>
+                    <p>This might take a moment (first time: 2-3 minutes)</p>
+                    <p class="pulse">Processing with CLIP neural network...</p>
+                </div>
+            `;
+        }
+
+        function displayRealResults(results) {
+            const resultsDiv = document.getElementById('results');
+            let html = '<div style="text-align: center; margin-bottom: 20px;"><h3>✅ AI Analysis Complete!</h3></div>';
+            
+            results.forEach((result) => {
+                const confidence = result.confidence;
+                html += `
+                    <div class="caption-item">
+                        <div class="caption-rank">${result.rank}</div>
+                        <div class="caption-text">${result.caption}</div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: ${confidence * 100}%"></div>
+                        </div>
+                        <div class="confidence-text">Confidence: ${(confidence * 100).toFixed(1)}%</div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                <div class="info-box" style="margin-top: 30px;">
+                    <p><strong>🎉 Real AI Results!</strong></p>
+                    <p>Powered by OpenAI's CLIP neural network</p>
+                    <p>Try uploading different images to see how the AI responds!</p>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        function showError(message) {
+            const results = document.getElementById('results');
+            results.innerHTML = `
+                <div class="info-box" style="border-color: #f44336; background: linear-gradient(145deg, #ffebee, #ffffff);">
+                    <h3 style="color: #d32f2f;">❌ Error</h3>
+                    <p style="color: #d32f2f;">${message}</p>
+                    <p><strong>💡 Try:</strong></p>
+                    <p>• Upload a different image</p>
+                    <p>• Check your internet connection</p>
+                    <p>• Wait a moment and try again</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
