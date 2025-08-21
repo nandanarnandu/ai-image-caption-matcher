@@ -4,7 +4,7 @@
 [![Flask](https://img.shields.io/badge/flask-v2.3+-green.svg)](https://flask.palletsprojects.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> A web app that uses OpenAI's CLIP neural network to find perfect captions for your images with a beautiful animated interface.
+> An AI-powered application that generates captions for images and matches them with the most relevant text descriptions. Built with **Python, PyTorch, Hugging Face Transformers, and Flask.**
 
 ## ✨ Features
 
@@ -17,7 +17,7 @@
 
 ```bash
 # Clone and setup
-git clone https://github.com/yourusername/ai-image-caption-matcher.git
+git clone https://github.com/nandanarnandu/ai-image-caption-matcher.git
 cd ai-image-caption-matcher
 python -m venv venv
 source venv/bin/activate  # or venv\Scripts\activate on Windows
@@ -64,6 +64,7 @@ MIT License
 4. Submit pull request
 
 ---
+
 
 
 
