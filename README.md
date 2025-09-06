@@ -6,6 +6,9 @@
 
 > An AI-powered application that generates captions for images and matches them with the most relevant text descriptions. Built with **Python, PyTorch, Hugging Face Transformers, and Flask.**
 
+<img width="1548" height="869" alt="Screenshot 2025-09-07 001840" src="https://github.com/user-attachments/assets/4643fb19-dd15-45f7-99b9-eb5fa752e378" />
+<img width="1284" height="901" alt="Screenshot 2025-09-07 002102" src="https://github.com/user-attachments/assets/265d0868-7fe2-447b-9431-f376eca1a19f" />
+
 ## ✨ Features
 
 - **🧠 AI-Powered** - Uses OpenAI CLIP for image-text matching
@@ -64,6 +67,7 @@ MIT License
 4. Submit pull request
 
 ---
+
 
 
 
